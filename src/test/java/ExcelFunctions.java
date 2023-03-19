@@ -1,3 +1,4 @@
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.testng.Assert;
 import java.io.File;
@@ -8,9 +9,40 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
+@Slf4j
 public class ExcelFunctions {
 
+    public static void main(String args[]) throws IOException {
+
+
+        //Write
+        String fileWrite=System.getProperty("user.dir")+"/src/test/resources/Excel/WriteExcel.xlsx";
+        ExcelFunctions ef=new ExcelFunctions();
+        ef.writeExcel(fileWrite,"Sheet1",0,0,"First Name");
+        ef.writeExcel(fileWrite,"Sheet1",0,1,"Last Name");
+        ef.writeExcel(fileWrite,"Sheet1",1,0,"Jishnu");
+        ef.writeExcel(fileWrite,"Sheet1",1,1,"Nambiar");
+        ef.writeExcel(fileWrite,"Sheet1",2,0,"Parveen");
+        ef.writeExcel(fileWrite,"Sheet1",2,1,"Banu");
+        ef.writeExcel(fileWrite,"Sheet1",3,0,"Nishtha");
+        ef.writeExcel(fileWrite,"Sheet1",3,1,"Kavin");
+        ef.writeExcel(fileWrite,"Sheet1",4,0,"Puneeth");
+        ef.writeExcel(fileWrite,"Sheet1",4,1,"Aishwarya");
+
+
+        //Negative scenario
+        String filePathExpected=System.getProperty("user.dir")+"/src/test/resources/Excel/ExpectedFile.xlsx";
+        String filePathActualWrong=System.getProperty("user.dir")+"/src/test/resources/Excel/ActualFileWrong.xlsx";
+
+        ef.verifyDataInAllSheets(filePathExpected,filePathActualWrong);
+
+
+        //Postive Scenario
+        String filePathActual=System.getProperty("user.dir")+"/src/test/resources/Excel/ActualFileWrong.xlsx";
+        ef.verifyDataInAllSheets(filePathExpected,filePathActual);
+
+
+    }
     /*
      Author:Jishnu Nambiar
      Description:Compare the data between the excel
@@ -72,6 +104,7 @@ public class ExcelFunctions {
                 }
 
             }
+            System.out.println("***Data is same in Excel***");
         }
         //Even if the code fails the Workbook should not be left open
         finally {
@@ -89,7 +122,8 @@ public class ExcelFunctions {
             String filePathActual-File path of the actual excel
       output:void
       */
-    public static void verifyRowsandColumnInSheets(String filePathExpected, String filePathActual) throws IOException {
+    public void verifyRowsandColumnInSheets(String filePathExpected, String filePathActual) throws IOException {
+        System.out.println("Verifying if both work books have same number of Rows and Columns in a sheet--->Started");
         Workbook workbook1 = WorkbookFactory.create(new File(filePathExpected));
         Workbook workbook2 = WorkbookFactory.create(new File(filePathActual));
         try {
@@ -112,10 +146,12 @@ public class ExcelFunctions {
                     Assert.assertTrue(cellCounts1 == cellCounts2, "Column count are not same");
                 }
             }
+            System.out.println("Both Workbooks same number of Rows and Columns in a sheet");
         } finally {
             workbook1.close();
             workbook2.close();
         }
+        System.out.println("Verifying if both work books have same number of Rows and Columns in a sheet--->Completed");
 
     }
 
@@ -126,8 +162,8 @@ public class ExcelFunctions {
             String filePathActual-File path of the actual excel
       output:void
       */
-    public static void verifySameNumberandNamesOfSheets(String filePathExpected, String filePathActual) throws IOException {
-        System.out.println("Verifying if both work books have same number of sheets");
+    public void verifySameNumberandNamesOfSheets(String filePathExpected, String filePathActual) throws IOException {
+        System.out.println("Verifying if both work books have same number of sheets--->Started");
         Workbook workbook1 = WorkbookFactory.create(new File(filePathExpected));
         Workbook workbook2 = WorkbookFactory.create(new File(filePathActual));
         try {
@@ -147,11 +183,13 @@ public class ExcelFunctions {
             }
             Collections.sort(sheetsNameOfWb1);
             Collections.sort(sheetsNameOfWb2);
-            Assert.assertTrue(sheetsNameOfWb1 == sheetsNameOfWb2, "Sheet name not same in Excel");
+            Assert.assertTrue(sheetsNameOfWb1.equals(sheetsNameOfWb2), "Sheet Name in Workbook1: "+sheetsNameOfWb1+" and WorkBook2: "+sheetsNameOfWb1+".Both are not same");
+            System.out.println("The excel is having same number and name of Sheets");
         } finally {
             workbook1.close();
             workbook2.close();
         }
+        System.out.println("Verifying if both work books have same number of sheets--->Completed");
     }
 
     /*
@@ -164,8 +202,7 @@ public class ExcelFunctions {
             String value-Value to entered in cell
       output:void
       */
-    public static void writeExcel(String path, String sheetName, int rowNumber, int ColumnNumber, String value) throws IOException {
-
+    public void writeExcel(String path, String sheetName, int rowNumber, int ColumnNumber, String value) throws IOException {
         File src = new File(path);
         FileInputStream fis = new FileInputStream(src);
         Workbook wb1 = WorkbookFactory.create(fis);
@@ -178,8 +215,10 @@ public class ExcelFunctions {
             xs.getRow(rowNumber).createCell(ColumnNumber).setCellValue(value);
             FileOutputStream fout = new FileOutputStream(src);
             wb1.write(fout);
+            System.out.println("Data "+value+" added in row:"+rowNumber+" Column:"+ColumnNumber+" in sheet:"+sheetName);
         } finally {
             wb1.close();
         }
+
     }
 }
